@@ -3,6 +3,8 @@ CREATE DATABASE IF NOT EXISTS campus_flea_market
     DEFAULT COLLATE utf8mb4_unicode_ci;
 
 USE campus_flea_market;
+UPDATE campus_flea_market.users SET password = '123456' WHERE user_id > 0;
+SELECT * FROM users;
 
 -- 用户表 users
 CREATE TABLE users (
@@ -52,22 +54,22 @@ CREATE TABLE reviews (
 );
 
 -- users表测试数据
-INSERT INTO users (username, email, phone) VALUES
-('zhangsan', 'zs@school.edu', '13800138001'),
-('lisi', 'ls@school.edu', '13800138002'),
-('wangwu', 'ww@school.edu', '13800138003'),
-('zhaoliu', 'zl@school.edu', '13800138004'),
-('qianqi', 'qq@school.edu', '13800138005'),
-('sunba', 'sb@school.edu', '13800138006'),
-('zhoujiu', 'zj@school.edu', '13800138007'),
-('wushi', 'ws@school.edu', '13800138008'),
-('zhengshi', 'zs2@school.edu', '13800138009'),
-('dongfang', 'df@school.edu', '13800138010'),
-('ximen', 'xm@school.edu', '13800138011'),
-('nangong', 'ng@school.edu', '13800138012'),
-('beigong', 'bg@school.edu', '13800138013'),
-('guiguzi', 'ggz@school.edu', '13800138014'),
-('mozi', 'mz@school.edu', '13800138015');
+INSERT INTO users (username, email, phone, password) VALUES
+('zhangsan', 'zs@school.edu', '13800138001','123456'),
+('lisi', 'ls@school.edu', '13800138002','123456'),
+('wangwu', 'ww@school.edu', '13800138003','123456'),
+('zhaoliu', 'zl@school.edu', '13800138004','123456'),
+('qianqi', 'qq@school.edu', '13800138005','123456'),
+('sunba', 'sb@school.edu', '13800138006','123456'),
+('zhoujiu', 'zj@school.edu', '13800138007','123456'),
+('wushi', 'ws@school.edu', '13800138008','123456'),
+('zhengshi', 'zs2@school.edu', '13800138009','123456'),
+('dongfang', 'df@school.edu', '13800138010','123456'),
+('ximen', 'xm@school.edu', '13800138011','123456'),
+('nangong', 'ng@school.edu', '13800138012','123456'),
+('beigong', 'bg@school.edu', '13800138013','123456'),
+('guiguzi', 'ggz@school.edu', '13800138014','123456'),
+('mozi', 'mz@school.edu', '13800138015','123456');
 
 -- products表测试数据
 INSERT INTO products (seller_id, title, description, price, category) VALUES

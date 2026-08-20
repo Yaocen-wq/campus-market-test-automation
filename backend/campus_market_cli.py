@@ -94,7 +94,7 @@ def login():
     sql = "SELECT user_id, password FROM users WHERE username = %s;"
     cursor.execute(sql, (username,))
     result = cursor.fetchone()
-
+    
     cursor.close()
     conn.close()
 
@@ -124,17 +124,23 @@ def publish_product():
     )
     cursor = conn.cursor()
     sql = "INSERT INTO products (seller_id, title, description, price, category) VALUES (%s, %s, %s, %s, %s);"
-    cursor.execute(sql, (current_user_id, title, description, price, category))
-    conn.commit()
+    try:
+        cursor.execute(sql, (current_user_id, title, description, price, category))
+        conn.commit()
+        print(f"发布成功 影响了 {cursor.rowcount} 行")
+    except Exception as e:
+        conn.rollback()
+        print(f"发布失败，已回滚：{e}")
+    finally:
+        cursor.close()
+        conn.close()
 
-    print(f"发布成功 影响了 {cursor.rowcount} 行")
-    cursor.close()
-    conn.close()
 
 def place_order():
     global current_user_id
     print("\n--- 下单 ---")
     product_id = input("请输入要购买的商品ID：")
+
     conn = pymysql.connect(
         host="localhost",
         user="root",
@@ -144,36 +150,40 @@ def place_order():
     )
     cursor = conn.cursor()
 
-    sql_product = "SELECT seller_id, price, status, title FROM products WHERE product_id = %s;"
-    cursor.execute(sql_product, (product_id,))
-    product = cursor.fetchone()
+    try:
+        sql_product = "SELECT seller_id, price, status, title FROM products WHERE product_id = %s;"
+        cursor.execute(sql_product, (product_id,))
+        product = cursor.fetchone()
 
-    if product is None:
-        print("商品不存在")
+        if product is None:
+            print("商品不存在")
+            return
+
+        seller_id, price, status, title = product
+
+        if status != 1:
+            print("该商品已下架，无法购买")
+            return
+
+        print(f"商品：{title}，价格：{price}元")
+        quantity = int(input("数量："))
+        total_price = float(price) * quantity
+
+        sql_order = """
+            INSERT INTO orders (buyer_id, product_id, seller_id, quantity, total_price)
+            VALUES (%s, %s, %s, %s, %s);
+        """
+        cursor.execute(sql_order, (current_user_id, product_id, seller_id, quantity, total_price))
+        conn.commit()
+        print(f"下单成功 金额：{total_price}元")
+
+    except Exception as e:
+        conn.rollback()
+        print(f"下单失败，已回滚：{e}")
+
+    finally:
         cursor.close()
         conn.close()
-        return
-    seller_id, price, status, title = product
-
-    if status != 1:
-        print("该商品已下架，无法购买")
-        cursor.close()
-        conn.close()
-        return
-    print(f"商品：{title}，价格：{price}元")
-
-    quantity = int(input("数量："))
-    total_price = float(price) * quantity
-    sql_order = """
-        INSERT INTO orders (buyer_id, product_id, seller_id, quantity, total_price)
-        VALUES (%s, %s, %s, %s, %s);
-    """
-
-    cursor.execute(sql_order, (current_user_id, product_id, seller_id, quantity, total_price))
-    conn.commit()
-    print(f"下单成功 金额：{total_price}元")
-    cursor.close()
-    conn.close()
 
 def view_orders():
     global current_user_id
